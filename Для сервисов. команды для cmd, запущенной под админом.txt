@@ -1,0 +1,11 @@
+Для сервисов. команды для cmd, запущенной под админом
+
+
+C:\Users\Sergey\source\repos\VoidPtr_18_Services_2\Release\VoidPtr_18_Services_2.exe  -create
+
+C:\Users\Sergey\source\repos\VoidPtr_18_Services_2\Release\VoidPtr_18_Services_2.exe  -start
+
+
+C:\Users\Sergey\source\repos\VoidPtr_18_Services_2\Release\VoidPtr_18_Services_2.exe  -delete
+
+C:\Users\Sergey\source\repos\VoidPtr_18_Services_2\Release\VoidPtr_18_Services_2.exe  -stop

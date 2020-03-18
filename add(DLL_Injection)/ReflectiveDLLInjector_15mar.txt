@@ -1,0 +1,63 @@
+#include<iostream>
+#include<windows.h>
+
+#define MY_DLL 1
+
+#if MY_DLL
+char DllName[MAX_PATH] = "D:\\_______2020_information\\VS_2017_Projects\\Dll2\\Release\\Dll2.dll";
+#else
+char DllName[MAX_PATH] = "D:\\_______2020_information\\VS_2017_Projects\\DLL_from_video\\ImpruvedReflectiveDllInjection\\bin\\reflective_dll.dll";
+#endif
+
+void ERR(const char* functionName) 
+{  
+	std::cout << functionName <<"_Error:   " << GetLastError() << std::endl;
+	system("Pause");
+}
+
+//char PartialDllName[255];
+char WindowName[MAX_PATH] = "Header";
+
+int main()
+{
+	DWORD PID;
+	//std::cout << "Enter the Window Name: ";
+	//std::cin.getline(WindowName, sizeof(WindowName));
+
+	HWND Program = FindWindowA(NULL, WindowName);
+	if (Program == NULL)
+		ERR("Failed to fine window: FindWindowA");
+	else
+	{
+		GetWindowThreadProcessId(Program, &PID);
+		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID);
+		if (hProcess == NULL)	
+			ERR("OpenProcess");		
+		else 
+		{
+			//std::cout << "\nEnter the DLL name: ";
+			//std::cin >> PartialDllName;
+			//GetFullPathNameA(PartialDllName, MAX_PATH, DllName, NULL);// Gets full path of the DLL
+			LPVOID LoadLib = (LPVOID)GetProcAddress(GetModuleHandle("kernel32.dll"),"LoadLibraryA");
+			if(LoadLib == NULL)ERR("GetProcAddress");
+
+			LPVOID RemoteString = VirtualAllocEx(hProcess, NULL, strlen(DllName), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+			if (RemoteString == NULL)
+				ERR("VirtualAllocEx");
+
+
+			if (WriteProcessMemory(hProcess, RemoteString, DllName, strlen(DllName), NULL) == 0)
+				ERR("WriteProcessMemory");// Write the dll into memory
+			
+
+			if (CreateRemoteThread(hProcess, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLib, (LPVOID)RemoteString, NULL, NULL) == NULL)
+				ERR("WriteProcessMemory");
+			
+
+			std::cout << "\n"<< DllName <<"\n was injected successfully into "<< WindowName<<"  window process\n";
+			CloseHandle(hProcess);
+			system("Pause");
+			exit(0);
+		}
+	}
+}
